@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+
+<style type="text/css">
+	h4 {font-family: sans-serif;}
+	p {font-family: sans-serif;}
+	a {font-family: sans-serif; color:#d15423; text-decoration:none;}
+</style>
+
+
+<title>Concord Consortium - Moving rectangle</title>
+
+<script type="text/javascript">
+
+
+window.addEventListener("load", windowLoadHandler, false);
+
+function windowLoadHandler() {
+	canvasApp();
+}
+
+function canvasApp() {
+
+	var myCanvas = document.getElementById("canvasOne");
+	var context = myCanvas.getContext("2d");
+	var dragging;
+	var mouseX;
+	var mouseY;
+	var dragHoldX;
+	var dragHoldY;
+	var downclick = 0;
+
+	var rect = new Rectangle("#0000ff", 50, 50);
+
+  // Draw rectangle on the canvas
+  drawRectangle();
+
+  // Start Listen for moving the mouse
+	myCanvas.addEventListener("mousedown", mouseDownListener, false);
+
+	function Rectangle (color, x, y) {
+		this.color = color;
+		this.x = x;
+		this.y = y;
+		this.width = 40;
+		this.height = 40;
+	}
+
+	function mouseDownListener(evt) {
+    // console.log("inside mouseDownListener");
+		downclick = downclick + 1;
+
+		// Find out where the user had mouse down
+		var bRect = myCanvas.getBoundingClientRect();
+		mouseX = evt.clientX - bRect.left;
+		mouseY = evt.clientY - bRect.top;
+
+		// Check to see if you are on the rectangle
+    var left = rect.x, right = rect.x+rect.width;
+    var top = rect.y, bottom = rect.y+rect.height;
+
+    if (right >= mouseX && left <= mouseX
+      && bottom >= mouseY && top <= mouseY) {
+					console.log("on a square");
+					dragHoldX = mouseX-rect.x;
+					dragHoldY = mouseY-rect.y;
+          dragging = true;
+				} else {
+					console.log("not on a square");
+				}
+
+		if (dragging) {
+			window.addEventListener("mousemove", mouseMoveListener, false);
+		}
+
+		myCanvas.removeEventListener("mousedown", mouseDownListener, false);
+		window.addEventListener("mouseup", mouseUpListener, false);
+	}
+
+	function mouseUpListener(evt) {
+		// console.log("Inside mouseUpListener");
+		myCanvas.addEventListener("mousedown", mouseDownListener, false);
+		window.removeEventListener("mouseup", mouseUpListener, false);
+		if (dragging) {
+			dragging = false;
+			window.removeEventListener("mousemove", mouseMoveListener, false);
+		}
+	}
+
+	function mouseMoveListener(evt) {
+		// console.log("Inside mouseMoveListener");
+		//getting mouse position correctly
+		var bRect = myCanvas.getBoundingClientRect();
+		mouseX = evt.clientX - bRect.left;
+		mouseY = evt.clientY - bRect.top;
+
+    // Determine where the mouse has moved to and reset the rectangle to that point
+		rect.x = mouseX - dragHoldX;
+		rect.y = mouseY - dragHoldY;
+
+		drawRectangle();
+	}
+
+	function getCursorPosition(canvas, event) {
+	    var rect = canvas.getBoundingClientRect();
+	    var x = event.clientX - rect.left;
+	    var y = event.clientY - rect.top;
+	    console.log("x: " + x + " y: " + y);
+	}
+
+	function drawRectangle() {
+		//console.log("inside drawRectangle");
+		context.clearRect(0,0,myCanvas.width,myCanvas.height);
+    context.fillStyle = rect.color;
+    context.fillRect(rect.x,rect.y,rect.width,rect.height);
+	}
+}
+
+</script>
+</head>
+<body>
+	<h4>Concord Consortium - Dragging Objects by Caroline Wester</h4>
+	<canvas id="canvasOne" width="500" height="300"style="border:4px solid #000000;" ></canvas>
+<p>Drag the square with the mouse.</p>
+</body>
+</html>
